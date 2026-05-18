@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// ScriptableObject that stores configuration data for agent species and life stages.
-/// Each agent prefab should reference one of these assets.
-/// </summary>
 [CreateAssetMenu(fileName = "SpeciesData", menuName = "PredatorPrey/SpeciesData")]
 public class SpeciesData : ScriptableObject
 {

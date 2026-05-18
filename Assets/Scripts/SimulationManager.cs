@@ -2,10 +2,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// Singleton manager for the entire predator-prey simulation.
-/// Tracks all active agents, statistics, and handles lifecycle events.
-/// </summary>
 public class SimulationManager : MonoBehaviour
 {
     public static SimulationManager Instance { get; private set; }
@@ -14,23 +10,29 @@ public class SimulationManager : MonoBehaviour
     [SerializeField] private GameObject preyJuvenilePrefab;
     [SerializeField] private GameObject predatorJuvenilePrefab;
 
-    // All active agents
-    private List<Agent> allAgents = new List<Agent>();
+    [Header("Statistics")]
+    [SerializeField] private float statisticsReportInterval = 5f;
 
-    // Agents by species (for fast lookup)
-    private List<Agent> predators = new List<Agent>();
-    private List<Agent> prey = new List<Agent>();
+    // -------------------------------------------------------------------------
+    // Tracking
+    // -------------------------------------------------------------------------
 
-    // Statistics tracking
+    private readonly List<Agent> allAgents = new List<Agent>();
+    private readonly List<Agent> predators = new List<Agent>();
+    private readonly List<Agent> prey = new List<Agent>();
+
     private int totalBirths = 0;
     private int totalDeaths = 0;
     private int totalKills = 0;
     private float simulationTime = 0f;
-    private float statisticsTimer = 0f;
+    private float statisticsTimer;
+
+    // -------------------------------------------------------------------------
+    // Unity lifecycle
+    // -------------------------------------------------------------------------
 
     private void Awake()
     {
-        // Singleton pattern
         if (Instance != null && Instance != this)
         {
             Debug.LogWarning("Multiple SimulationManager instances found. Destroying duplicate.");
@@ -40,16 +42,14 @@ public class SimulationManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
         statisticsTimer = statisticsReportInterval;
     }
 
     private void Update()
     {
         simulationTime += Time.deltaTime;
-
-        // Print statistics periodically
         statisticsTimer -= Time.deltaTime;
+
         if (statisticsTimer <= 0f)
         {
             statisticsTimer = statisticsReportInterval;
@@ -57,66 +57,37 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Register a new agent in the simulation.
-    /// Called when an agent is spawned.
-    /// </summary>
+    // -------------------------------------------------------------------------
+    // Agent registration
+    // -------------------------------------------------------------------------
+
     public void RegisterAgent(Agent agent)
     {
         if (agent == null) return;
 
-        // Add to global list
-        if (!allAgents.Contains(agent))
-        {
-            allAgents.Add(agent);
-        }
+        if (!allAgents.Contains(agent)) allAgents.Add(agent);
 
-        // Add to species-specific list
-        if (agent.AgentSpecies == Species.Predator)
-        {
-            if (!predators.Contains(agent))
-                predators.Add(agent);
-        }
-        else if (agent.AgentSpecies == Species.Prey)
-        {
-            if (!prey.Contains(agent))
-                prey.Add(agent);
-        }
+        if (agent.AgentSpecies == Species.Predator && !predators.Contains(agent)) predators.Add(agent);
+        else if (agent.AgentSpecies == Species.Prey && !prey.Contains(agent)) prey.Add(agent);
     }
 
-    /// <summary>
-    /// Unregister an agent from the simulation.
-    /// Called when an agent dies.
-    /// </summary>
     public void UnregisterAgent(Agent agent, DeathCause cause)
     {
         if (agent == null) return;
 
-        // Remove from global list
         allAgents.Remove(agent);
 
-        // Remove from species-specific list
-        if (agent.AgentSpecies == Species.Predator)
-        {
-            predators.Remove(agent);
-        }
-        else if (agent.AgentSpecies == Species.Prey)
-        {
-            prey.Remove(agent);
-        }
+        if (agent.AgentSpecies == Species.Predator) predators.Remove(agent);
+        else if (agent.AgentSpecies == Species.Prey) prey.Remove(agent);
 
-        // Update statistics
         totalDeaths++;
-        if (cause == DeathCause.Predation)
-        {
-            totalKills++;
-        }
+        if (cause == DeathCause.Predation) totalKills++;
     }
 
-    /// <summary>
-    /// Spawn an offspring from two parent agents.
-    /// Called when adults successfully mate.
-    /// </summary>
+    // -------------------------------------------------------------------------
+    // Reproduction
+    // -------------------------------------------------------------------------
+
     public Agent SpawnOffspring(Agent parent1, Agent parent2)
     {
         if (parent1 == null || parent2 == null)
@@ -131,81 +102,61 @@ public class SimulationManager : MonoBehaviour
             return null;
         }
 
-        // Subtract reproduction cost from both parents
-        float reproductionCost = parent1.SpeciesData != null ? parent1.SpeciesData.ReproductionEnergyCost : 25f;
-        parent1.ConsumeEnergy(reproductionCost);
-        parent2.ConsumeEnergy(reproductionCost);
+        float cost = parent1.SpeciesData != null ? parent1.SpeciesData.ReproductionEnergyCost : 25f;
+        parent1.ConsumeEnergy(cost);
+        parent2.ConsumeEnergy(cost);
 
-        // Determine offspring prefab based on parent species
-        GameObject offspringPrefab = null;
-        if (parent1.AgentSpecies == Species.Prey)
-        {
-            offspringPrefab = preyJuvenilePrefab;
-        }
-        else if (parent1.AgentSpecies == Species.Predator)
-        {
-            offspringPrefab = predatorJuvenilePrefab;
-        }
+        GameObject prefab = parent1.AgentSpecies == Species.Prey
+            ? preyJuvenilePrefab
+            : predatorJuvenilePrefab;
 
-        if (offspringPrefab == null)
+        if (prefab == null)
         {
             Debug.LogError("Offspring prefab not assigned in SimulationManager");
             return null;
         }
 
-        // Spawn offspring near parent1
-        Vector3 spawnOffset = Random.insideUnitSphere * 2f;  // Random offset within 2 units
-        spawnOffset.y = 0f;  // Keep on same height as parent
-        Vector3 spawnPosition = parent1.transform.position + spawnOffset;
+        Vector3 offset = Random.insideUnitSphere * 2f;
+        offset.y = 0f;
+        Vector3 spawnPos = parent1.transform.position + offset;
 
-        // Instantiate offspring
-        GameObject offspringInstance = Instantiate(offspringPrefab, spawnPosition, Quaternion.identity);
-        offspringInstance.name = $"{(parent1.AgentSpecies == Species.Prey ? "PreyJuvenile" : "PredatorJuvenile")}_Offspring_{totalBirths}";
+        GameObject obj = Instantiate(prefab, spawnPos, Quaternion.identity);
+        obj.name = $"{(parent1.AgentSpecies == Species.Prey ? "PreyJuvenile" : "PredatorJuvenile")}_Offspring_{totalBirths}";
 
-        // The offspring will auto-register in its Start() method
-        Agent offspringAgent = offspringInstance.GetComponent<Agent>();
-        if (offspringAgent == null)
+        Agent offspring = obj.GetComponent<Agent>();
+        if (offspring == null)
         {
-            Debug.LogError("Offspring prefab does not have Agent component");
-            Destroy(offspringInstance);
+            Debug.LogError("Offspring prefab is missing Agent component");
+            Destroy(obj);
             return null;
         }
 
-        // Increment birth counter
         totalBirths++;
-
-        Debug.Log($"Offspring spawned: {offspringInstance.name}. Total births: {totalBirths}");
-
-        return offspringAgent;
+        Debug.Log($"Offspring spawned: {obj.name}. Total births: {totalBirths}");
+        return offspring;
     }
 
-    /// <summary>
-    /// Print current simulation statistics to console.
-    /// </summary>
+    // -------------------------------------------------------------------------
+    // Statistics
+    // -------------------------------------------------------------------------
+
     private void PrintStatistics()
     {
-        int predatorCount = predators.Count;
-        int preyCount = prey.Count;
+        float avgPredEnergy = predators.Count > 0 ? predators.Average(p => p.CurrentEnergy) : 0f;
+        float avgPreyEnergy = prey.Count > 0 ? prey.Average(p => p.CurrentEnergy) : 0f;
 
-        float avgPredatorEnergy = predatorCount > 0
-            ? predators.Average(p => p.CurrentEnergy)
-            : 0f;
-
-        float avgPreyEnergy = preyCount > 0
-            ? prey.Average(p => p.CurrentEnergy)
-            : 0f;
-
-        string stats = $"[{simulationTime:F1}s] " +
-                      $"Prey: {preyCount} (Avg Energy: {avgPreyEnergy:F1}) | " +
-                      $"Predators: {predatorCount} (Avg Energy: {avgPredatorEnergy:F1}) | " +
-                      $"Births: {totalBirths} | " +
-                      $"Deaths: {totalDeaths} | " +
-                      $"Kills: {totalKills}";
-
-        Debug.Log(stats);
+        Debug.Log(
+            $"[{simulationTime:F1}s] " +
+            $"Prey: {prey.Count} (Avg Energy: {avgPreyEnergy:F1}) | " +
+            $"Predators: {predators.Count} (Avg Energy: {avgPredEnergy:F1}) | " +
+            $"Births: {totalBirths} | Deaths: {totalDeaths} | Kills: {totalKills}"
+        );
     }
 
-    // Getter methods for debugging and other systems
+    // -------------------------------------------------------------------------
+    // Public getters
+    // -------------------------------------------------------------------------
+
     public int GetPredatorCount() => predators.Count;
     public int GetPreyCount() => prey.Count;
     public int GetTotalAgentCount() => allAgents.Count;

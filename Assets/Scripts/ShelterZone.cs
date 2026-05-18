@@ -1,156 +1,100 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>
-/// Represents a shelter zone where prey can hide from predators.
-/// Shelter zones are trigger volumes that protect prey from attacks.
-/// Prey inside cannot be attacked by predators, but also cannot eat grass.
-/// </summary>
 [RequireComponent(typeof(Collider))]
 public class ShelterZone : MonoBehaviour
 {
     [Header("Shelter Settings")]
-    [SerializeField] private float shelterCapacity = 10f;  // Max prey that can hide simultaneously
+    [SerializeField] private int shelterCapacity = 10;
 
-    [Header("Protection Settings")]
-    [SerializeField] private bool blocksPredatorAttacks = true;  // Predators cannot attack prey inside
-    [SerializeField] private float protectionRadius = 5f;  // Radius of shelter protection
-
-    // Runtime state
-    private List<Agent> preyInside = new List<Agent>();
+    private readonly List<Agent> preyInside = new List<Agent>();
     private Collider shelterCollider;
+
+    // -------------------------------------------------------------------------
+    // Unity lifecycle
+    // -------------------------------------------------------------------------
 
     private void Awake()
     {
         shelterCollider = GetComponent<Collider>();
         if (shelterCollider == null)
         {
-            Debug.LogError($"ShelterZone {gameObject.name} requires a Collider component");
+            Debug.LogError($"ShelterZone '{gameObject.name}' has no Collider.");
             return;
         }
 
-        // Shelter zones should be triggers for detection
         shelterCollider.isTrigger = true;
 
-        // Set layer to Shelter if not already set
-        if (gameObject.layer != LayerMask.NameToLayer("Shelter"))
-        {
-            gameObject.layer = LayerMask.NameToLayer("Shelter");
-        }
+        int shelterLayer = LayerMask.NameToLayer("Shelter");
+        if (shelterLayer >= 0 && gameObject.layer != shelterLayer)
+            gameObject.layer = shelterLayer;
     }
 
-    /// <summary>
-    /// Called when a collider enters the shelter trigger.
-    /// </summary>
+    // -------------------------------------------------------------------------
+    // Trigger events — these are the single source of truth for shelter state
+    // -------------------------------------------------------------------------
+
     private void OnTriggerEnter(Collider other)
     {
         Agent agent = other.GetComponent<Agent>();
-        if (agent != null && agent.AgentSpecies == Species.Prey)
-        {
-            // Only add if not already inside (prevent duplicates)
-            if (!preyInside.Contains(agent))
-            {
-                preyInside.Add(agent);
-            }
-        }
+        if (agent == null || agent.AgentSpecies != Species.Prey) return;
+        if (preyInside.Contains(agent)) return;
+
+        preyInside.Add(agent);
+        agent.SetInShelter(true);
     }
 
-    /// <summary>
-    /// Called when a collider exits the shelter trigger.
-    /// </summary>
     private void OnTriggerExit(Collider other)
     {
         Agent agent = other.GetComponent<Agent>();
-        if (agent != null)
-        {
-            preyInside.Remove(agent);
-        }
+        if (agent == null) return;
+
+        preyInside.Remove(agent);
+        agent.SetInShelter(false);
     }
 
-    /// <summary>
-    /// Check if an agent is currently inside this shelter.
-    /// </summary>
-    public bool IsAgentInside(Agent agent)
-    {
-        return agent != null && preyInside.Contains(agent);
-    }
+    // -------------------------------------------------------------------------
+    // Public API
+    // -------------------------------------------------------------------------
 
-    /// <summary>
-    /// Get all prey currently inside this shelter.
-    /// </summary>
-    public List<Agent> GetPreyInside()
-    {
-        // Clean up null entries (dead agents)
-        preyInside.RemoveAll(prey => prey == null);
-        return new List<Agent>(preyInside);
-    }
+    public bool IsAgentInside(Agent agent) => agent != null && preyInside.Contains(agent);
 
-    /// <summary>
-    /// Check if shelter has capacity for more prey.
-    /// </summary>
     public bool HasCapacity()
     {
+        preyInside.RemoveAll(p => p == null);
         return preyInside.Count < shelterCapacity;
     }
 
-    /// <summary>
-    /// Get current occupancy (for debugging).
-    /// </summary>
-    public int GetOccupancy()
+    public List<Agent> GetPreyInside()
     {
-        preyInside.RemoveAll(prey => prey == null);
-        return preyInside.Count;
+        preyInside.RemoveAll(p => p == null);
+        return new List<Agent>(preyInside);
     }
 
-    /// <summary>
-    /// Get shelter capacity (for debugging).
-    /// </summary>
-    public float GetCapacity()
-    {
-        return shelterCapacity;
-    }
+    public int GetOccupancy() => GetPreyInside().Count;
+    public int GetCapacity() => shelterCapacity;
 
-    /// <summary>
-    /// Check if a prey agent at a position is protected from a predator attack.
-    /// </summary>
-    public bool ProtectsFromAttack(Agent preyAgent, Agent predatorAgent)
-    {
-        if (!blocksPredatorAttacks)
-            return false;
+    // -------------------------------------------------------------------------
+    // Gizmos
+    // -------------------------------------------------------------------------
 
-        if (preyAgent == null || predatorAgent == null)
-            return false;
-
-        // Prey must be inside this shelter
-        if (!IsAgentInside(preyAgent))
-            return false;
-
-        return true;
-    }
-
-    /// <summary>
-    /// Debug visualization for shelter zone in editor.
-    /// </summary>
     private void OnDrawGizmosSelected()
     {
-        // Draw shelter bounds
-        Gizmos.color = new Color(0f, 0f, 1f, 0.2f);
         if (shelterCollider != null)
         {
-            Gizmos.DrawCube(transform.position + shelterCollider.bounds.center - transform.position,
-                           shelterCollider.bounds.size);
+            Gizmos.color = new Color(0f, 0f, 1f, 0.15f);
+            Gizmos.DrawCube(shelterCollider.bounds.center, shelterCollider.bounds.size);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireCube(shelterCollider.bounds.center, shelterCollider.bounds.size);
         }
 
-        // Draw protection radius
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, protectionRadius);
-
-        // Draw capacity indicator
+#if UNITY_EDITOR
         if (Application.isPlaying)
         {
-            Gizmos.color = Color.cyan;
-            string label = $"Shelter: {GetOccupancy()}/{shelterCapacity}";
-            UnityEditor.Handles.Label(transform.position + Vector3.up * 2f, label);
+            UnityEditor.Handles.Label(
+                transform.position + Vector3.up * 2f,
+                $"Shelter: {GetOccupancy()}/{shelterCapacity}");
         }
+#endif
     }
 }
