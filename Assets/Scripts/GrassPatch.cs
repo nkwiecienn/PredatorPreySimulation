@@ -62,6 +62,7 @@ public class GrassPatch : MonoBehaviour
         float energyRestored = (amountEaten / foodPerBite) *
                                (agent.SpeciesData != null ? agent.SpeciesData.EnergyRestoredByEating : 25f);
         agent.RestoreEnergy(energyRestored);
+        DebugLogger.LogGrassEaten(gameObject.name, agent.AgentId, energyRestored);
         UpdateVisuals();
         return energyRestored;
     }

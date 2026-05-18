@@ -23,16 +23,19 @@ public class AgentMovement : MonoBehaviour
     public void TurnLeft()
     {
         targetAngularVelocity = maxAngularVelocity;
+        DebugLogger.LogMovement(gameObject.name, AgentAction.TurnLeft);
     }
 
     public void TurnRight()
     {
         targetAngularVelocity = -maxAngularVelocity;
+        DebugLogger.LogMovement(gameObject.name, AgentAction.TurnRight);
     }
 
     public void MoveForward()
     {
         targetVelocity = transform.forward * moveSpeed;
+        DebugLogger.LogMovement(gameObject.name, AgentAction.MoveForward);
     }
 
     public void Idle()

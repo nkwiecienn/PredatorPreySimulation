@@ -145,6 +145,11 @@ public class AgentPerception : MonoBehaviour
             visibleObjects.Add(obj);
             CategorizeAndStore(obj);
         }
+
+        Agent agent = GetComponent<Agent>();
+        if (agent != null)
+            DebugLogger.LogPerceptionUpdate(agent.AgentId, visibleObjects.Count, visibleGrass.Count,
+                                           visiblePredators.Count, visiblePrey.Count);
     }
 
     // -------------------------------------------------------------------------

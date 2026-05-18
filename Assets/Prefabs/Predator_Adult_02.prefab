@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2914417787916627654
+--- !u!1 &2105929208991118612
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,49 +8,52 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7307416141308272524}
-  - component: {fileID: 1789083877417494540}
-  - component: {fileID: 1647794251275474828}
-  - component: {fileID: 1912622393354894843}
-  - component: {fileID: 1078853964809024851}
-  - component: {fileID: 4994014988443663515}
-  m_Layer: 0
-  m_Name: Prey_Adult
+  - component: {fileID: 6218172752945638049}
+  - component: {fileID: 4082283082944138368}
+  - component: {fileID: 5343385993141353927}
+  - component: {fileID: 1417693575007791858}
+  - component: {fileID: 7226852853915921386}
+  - component: {fileID: 7471792721062933274}
+  - component: {fileID: 5599114851256274285}
+  - component: {fileID: 6628795338568698043}
+  - component: {fileID: 4113054372663961218}
+  m_Layer: 6
+  m_Name: Predator_Adult_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7307416141308272524
+--- !u!4 &6218172752945638049
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2914417787916627654}
+  m_GameObject: {fileID: 2105929208991118612}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.1, y: 1.5, z: 0}
-  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_LocalPosition: {x: 7.72, y: 1.5, z: 7.93}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &1789083877417494540
+--- !u!33 &4082283082944138368
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2914417787916627654}
+  m_GameObject: {fileID: 2105929208991118612}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &1647794251275474828
+--- !u!23 &5343385993141353927
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2914417787916627654}
+  m_GameObject: {fileID: 2105929208991118612}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -69,7 +72,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a5cc1ee8c89ce164d865ab7a8c004d56, type: 2}
+  - {fileID: 2100000, guid: 7ac70cd0acd7fe043821d114c9ae5fda, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -93,13 +96,13 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &1912622393354894843
+--- !u!135 &1417693575007791858
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2914417787916627654}
+  m_GameObject: {fileID: 2105929208991118612}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -114,15 +117,15 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &1078853964809024851
+--- !u!54 &7226852853915921386
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2914417787916627654}
+  m_GameObject: {fileID: 2105929208991118612}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 0.1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -141,29 +144,60 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
---- !u!114 &4994014988443663515
+--- !u!114 &7471792721062933274
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2914417787916627654}
+  m_GameObject: {fileID: 2105929208991118612}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 55d6dd18708adfed7847f4a0ff8c480e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Agent
-  agentId: Prey_02
-  species: 1
-  lifeStage: 1
-  size: 4
-  bodyMass: 1
-  moveSpeed: 3
-  maxAcceleration: 10
-  maxAngularVelocity: 180
-  viewRadius: 8
-  viewAngle: 120
-  currentEnergy: 100
-  passiveEnergyLossPerStep: 0.2
-  starvationThreshold: 0
-  age: 0
+  agentId: Predator_02
+  speciesData: {fileID: 11400000, guid: c744bb4076aae37c4b72f66e2cd43a48, type: 2}
+  adultSpeciesData: {fileID: 0}
+  decisionInterval: 0.5
+--- !u!114 &5599114851256274285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105929208991118612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afbd60fad24e2f3eb9e6f9a721674cd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AgentMovement
+--- !u!114 &6628795338568698043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105929208991118612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b55b4841a68e320638fbf41ee51359f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AgentPerception
+  rayCount: 16
+  detectableLayers:
+    serializedVersion: 2
+    m_Bits: 960
+  rayHeightOffset: 0.5
+--- !u!114 &4113054372663961218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105929208991118612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 935c1748203bfb9d78a0c0b3b394ac7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RandomBrain

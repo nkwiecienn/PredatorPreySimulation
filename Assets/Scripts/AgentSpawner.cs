@@ -38,7 +38,7 @@ public class AgentSpawner : MonoBehaviour
 
     private void SpawnInitialPopulation()
     {
-        Debug.Log("Starting to spawn initial population...");
+        DebugLogger.LogSpawnerInit(initialPreyAdults, initialPreyJuveniles, initialPredatorAdults, initialPredatorJuveniles);
 
         SpawnGroup(preyAdultPrefab, "PreyAdult", initialPreyAdults);
         SpawnGroup(preyJuvenilePrefab, "PreyJuvenile", initialPreyJuveniles);
@@ -47,7 +47,6 @@ public class AgentSpawner : MonoBehaviour
 
         int total = initialPreyAdults + initialPreyJuveniles
                   + initialPredatorAdults + initialPredatorJuveniles;
-        Debug.Log($"Spawned {total} initial agents.");
     }
 
     private void SpawnGroup(GameObject prefab, string namePrefix, int count)
@@ -79,7 +78,7 @@ public class AgentSpawner : MonoBehaviour
         Agent agent = obj.GetComponent<Agent>();
         if (agent == null)
         {
-            Debug.LogError($"Prefab '{prefab.name}' is missing an Agent component.");
+            DebugLogger.LogSpawnerError($"Prefab '{prefab.name}' is missing an Agent component.");
             Destroy(obj);
             return;
         }

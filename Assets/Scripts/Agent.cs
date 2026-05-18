@@ -98,6 +98,9 @@ public class Agent : MonoBehaviour
             ApplySpeciesData(speciesData, setEnergy: true);
 
         ApplyPhysicalSettings();
+
+        DebugLogger.LogAgentInit(agentId, speciesData?.Species.ToString() ?? "Unknown",
+                                speciesData?.LifeStage.ToString() ?? "Unknown");
     }
 
     private void Start()
@@ -206,6 +209,8 @@ public class Agent : MonoBehaviour
 
     private void ExecuteAction(AgentAction action)
     {
+        DebugLogger.LogAgentAction(agentId, action);
+
         switch (action)
         {
             case AgentAction.TurnLeft: TurnLeft(); break;
@@ -287,7 +292,8 @@ public class Agent : MonoBehaviour
             float gain = speciesData != null ? speciesData.AttackEnergyGain : 50f;
             target.Die(DeathCause.Predation);
             RestoreEnergy(gain);
-            Debug.Log($"{agentId} killed prey. Energy: {currentEnergy:F1}");
+            DebugLogger.LogAgentKill(agentId, target.AgentId);
+            DebugLogger.LogAgentEnergy(agentId, currentEnergy, maxEnergy, "after kill");
         }
     }
 
@@ -349,8 +355,7 @@ public class Agent : MonoBehaviour
 
         if (adultSpeciesData == null)
         {
-            Debug.LogError($"{agentId}: adultSpeciesData not assigned — cannot mature. " +
-                           "Assign it in the Juvenile prefab Inspector.");
+            DebugLogger.LogAgentError(agentId, "adultSpeciesData not assigned — cannot mature. Assign it in the Juvenile prefab Inspector.");
             return;
         }
 
@@ -358,7 +363,7 @@ public class Agent : MonoBehaviour
         ApplySpeciesData(adultSpeciesData, setEnergy: false);
         speciesData = adultSpeciesData;
 
-        Debug.Log($"{agentId} matured to Adult");
+        DebugLogger.LogAgentMatured(agentId);
     }
 
     // -------------------------------------------------------------------------
@@ -368,11 +373,13 @@ public class Agent : MonoBehaviour
     public void ConsumeEnergy(float amount)
     {
         currentEnergy = Mathf.Max(0f, currentEnergy - amount);
+        DebugLogger.LogAgentEnergy(agentId, currentEnergy, maxEnergy, "energy consumed");
     }
 
     public void RestoreEnergy(float amount)
     {
         currentEnergy = Mathf.Min(maxEnergy, currentEnergy + amount);
+        DebugLogger.LogAgentEnergy(agentId, currentEnergy, maxEnergy, "energy restored");
     }
 
     public void Die(DeathCause cause)
@@ -382,7 +389,7 @@ public class Agent : MonoBehaviour
         isAlive = false;
 
         SimulationManager.Instance?.UnregisterAgent(this, cause);
-        Debug.Log($"{agentId} died from {cause}");
+        DebugLogger.LogAgentDeath(agentId, cause);
         Destroy(gameObject);
     }
 

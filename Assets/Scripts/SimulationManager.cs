@@ -69,6 +69,8 @@ public class SimulationManager : MonoBehaviour
 
         if (agent.AgentSpecies == Species.Predator && !predators.Contains(agent)) predators.Add(agent);
         else if (agent.AgentSpecies == Species.Prey && !prey.Contains(agent)) prey.Add(agent);
+
+        DebugLogger.LogAgentInit(agent.AgentId, agent.AgentSpecies.ToString(), agent.AgentLifeStage.ToString());
     }
 
     public void UnregisterAgent(Agent agent, DeathCause cause)
@@ -132,7 +134,7 @@ public class SimulationManager : MonoBehaviour
         }
 
         totalBirths++;
-        Debug.Log($"Offspring spawned: {obj.name}. Total births: {totalBirths}");
+        DebugLogger.LogAgentReproduction(parent1.AgentId, parent2.AgentId, obj.name);
         return offspring;
     }
 
