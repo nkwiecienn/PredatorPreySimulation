@@ -24,6 +24,7 @@ public static class DebugLogger
     public static void LogAgentAction(string agentId, AgentAction action)
     {
         if (!enableAgentLogs || !ShouldLog(LogLevel.Verbose)) return;
+        if (action == AgentAction.Idle || action == AgentAction.MoveForward || action == AgentAction.TurnRight || action == AgentAction.TurnLeft) return;
         Debug.Log($"[AGENT] {agentId} performing action: {action}");
     }
 
@@ -72,6 +73,7 @@ public static class DebugLogger
     public static void LogPerceptionUpdate(string agentId, int visibleCount, int grassCount, int predatorCount, int preyCount)
     {
         if (!enablePerceptionLogs || !ShouldLog(LogLevel.Verbose)) return;
+        if (visibleCount == 0) return;
         Debug.Log($"[PERCEPTION] {agentId} sees: {visibleCount} objects " +
                   $"({grassCount} grass, {predatorCount} predators, {preyCount} prey)");
     }
@@ -190,19 +192,6 @@ public static class DebugLogger
                 return;
         }
         Debug.Log($"[LOGGER] {category} logging {(enable ? "enabled" : "disabled")}");
-    }
-
-    public static void LogSummary()
-    {
-        Debug.Log("[LOGGER] ========== LOGGER ENABLED CATEGORIES ==========");
-        Debug.Log($"  Agent:      {(enableAgentLogs ? "✓" : "✗")}");
-        Debug.Log($"  Perception: {(enablePerceptionLogs ? "✓" : "✗")}");
-        Debug.Log($"  Movement:   {(enableMovementLogs ? "✓" : "✗")}");
-        Debug.Log($"  Grass:      {(enableGrassLogs ? "✓" : "✗")}");
-        Debug.Log($"  Spawner:    {(enableSpawnerLogs ? "✓" : "✗")}");
-        Debug.Log($"  Simulation: {(enableSimulationLogs ? "✓" : "✗")}");
-        Debug.Log($"  Log Level:  {CurrentLogLevel}");
-        Debug.Log("[LOGGER] ==============================================");
     }
 
     // =========================================================================
