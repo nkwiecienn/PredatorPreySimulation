@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0794197fd2ef2500194d9327cf830f70, type: 3}
+  m_Name: PredatorJuvenileData
+  m_EditorClassIdentifier: Assembly-CSharp::SpeciesData
+  species: 0
+  lifeStage: 0
+  size: 1
+  bodyMass: 1
+  moveSpeed: 3
+  maxAngularVelocity: 180
+  viewRadius: 8
+  viewAngle: 120
+  maxEnergy: 100
+  startEnergy: 80
+  passiveEnergyLossPerSecond: 0.8
+  starvationThreshold: 0
+  energyRestoredByEating: 0
+  feedingRange: 0
+  attackRange: 1.5
+  attackEnergyGain: 50
+  matingRange: 0
+  minEnergyToReproduce: 0
+  reproductionEnergyCost: 0
+  offspringCount: 0
+  offspringBirthEnergy: 0
+  reproductionCooldown: 0
+  maturityAge: 30
