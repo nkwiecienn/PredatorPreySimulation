@@ -159,7 +159,7 @@ MonoBehaviour:
   agentId: Predator_01
   speciesData: {fileID: 11400000, guid: 8d601d5ea5aa57c768772f2274186eed, type: 2}
   adultSpeciesData: {fileID: 11400000, guid: c744bb4076aae37c4b72f66e2cd43a48, type: 2}
-  decisionInterval: 0.5
+  decisionInterval: 0.1
 --- !u!114 &490353773227326760
 MonoBehaviour:
   m_ObjectHideFlags: 0

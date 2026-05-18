@@ -113,7 +113,7 @@ public class AgentPerception : MonoBehaviour
         {
             float t = count > 1 ? (float)i / (count - 1) : 0.5f;
             float rayAngle = Mathf.Lerp(-viewAngle * 0.5f, viewAngle * 0.5f, t);
-            Vector3 dir = Quaternion.Euler(0f, rayAngle, 0f) * transform.forward;
+            Vector3 dir = Quaternion.Euler(-20f, rayAngle, 0f) * transform.forward;
 
             RaycastHit[] hits = Physics.RaycastAll(rayOrigin, dir, viewRadius, detectableLayers);
 
@@ -149,7 +149,7 @@ public class AgentPerception : MonoBehaviour
         Agent agent = GetComponent<Agent>();
         if (agent != null)
             DebugLogger.LogPerceptionUpdate(agent.AgentId, visibleObjects.Count, visibleGrass.Count,
-                                           visiblePredators.Count, visiblePrey.Count);
+                                           visiblePredators.Count, visiblePrey.Count, visibleShelters.Count);
     }
 
     // -------------------------------------------------------------------------
@@ -215,23 +215,23 @@ public class AgentPerception : MonoBehaviour
 
         Gizmos.color = Color.green;
         foreach (var o in visibleGrass)
-            Gizmos.DrawSphere(o.gameObject.transform.position, 0.2f);
+            Gizmos.DrawSphere(new Vector3(o.gameObject.transform.position.x, 4f, o.gameObject.transform.position.z), 0.5f);
 
         Gizmos.color = Color.blue;
         foreach (var o in visibleShelters)
-            Gizmos.DrawSphere(o.gameObject.transform.position, 0.2f);
+            Gizmos.DrawSphere(new Vector3(o.gameObject.transform.position.x, 4f, o.gameObject.transform.position.z), 0.5f);
 
         Gizmos.color = Color.red;
         foreach (var o in visiblePredators)
-            Gizmos.DrawSphere(o.gameObject.transform.position, 0.2f);
+            Gizmos.DrawSphere(new Vector3(o.gameObject.transform.position.x, 4f, o.gameObject.transform.position.z), 0.5f);
 
         Gizmos.color = new Color(1f, 0.5f, 0f);
         foreach (var o in visiblePrey)
-            Gizmos.DrawSphere(o.gameObject.transform.position, 0.2f);
+            Gizmos.DrawSphere(new Vector3(o.gameObject.transform.position.x, 4f, o.gameObject.transform.position.z), 0.5f);
 
         Gizmos.color = new Color(0.5f, 0.5f, 0.5f);
         foreach (var o in visibleObstacles)
-            Gizmos.DrawSphere(o.gameObject.transform.position, 0.2f);
+            Gizmos.DrawSphere(new Vector3(o.gameObject.transform.position.x, 4f, o.gameObject.transform.position.z), 0.5f);
     }
 }
 

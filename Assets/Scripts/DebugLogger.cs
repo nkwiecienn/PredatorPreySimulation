@@ -5,7 +5,7 @@ public static class DebugLogger
     public enum LogLevel { Verbose, Info, Warning, Error }
     public static LogLevel CurrentLogLevel = LogLevel.Verbose;
     private static bool enableAgentLogs = true;
-    private static bool enablePerceptionLogs = true;
+    private static bool enablePerceptionLogs = false;
     private static bool enableSimulationLogs = true;
     private static bool enableSpawnerLogs = true;
     private static bool enableMovementLogs = false;
@@ -24,7 +24,7 @@ public static class DebugLogger
     public static void LogAgentAction(string agentId, AgentAction action)
     {
         if (!enableAgentLogs || !ShouldLog(LogLevel.Verbose)) return;
-        if (action == AgentAction.Idle || action == AgentAction.MoveForward || action == AgentAction.TurnRight || action == AgentAction.TurnLeft) return;
+        if (action == AgentAction.Idle || action == AgentAction.MoveForward || action == AgentAction.TurnRight || action == AgentAction.TurnLeft || action == AgentAction.EatGrass) return;
         Debug.Log($"[AGENT] {agentId} performing action: {action}");
     }
 
@@ -70,12 +70,12 @@ public static class DebugLogger
     // Perception Logging
     // =========================================================================
 
-    public static void LogPerceptionUpdate(string agentId, int visibleCount, int grassCount, int predatorCount, int preyCount)
+    public static void LogPerceptionUpdate(string agentId, int visibleCount, int grassCount, int predatorCount, int preyCount, int shelterCount)
     {
         if (!enablePerceptionLogs || !ShouldLog(LogLevel.Verbose)) return;
-        if (visibleCount == 0) return;
+        if (grassCount + predatorCount + preyCount + shelterCount == 0) return;
         Debug.Log($"[PERCEPTION] {agentId} sees: {visibleCount} objects " +
-                  $"({grassCount} grass, {predatorCount} predators, {preyCount} prey)");
+                  $"({grassCount} grass, {predatorCount} predators, {preyCount} prey, {shelterCount} shelters)");
     }
 
     public static void LogPerceptionError(string agentId, string error)
