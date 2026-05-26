@@ -28,7 +28,7 @@ public class RandomBrain : MonoBehaviour, IAgentBrain
 
         switch (action)
         {
-            case AgentAction.MoveForward: return 40f;
+            case AgentAction.MoveForward: return MoveForwardWeight(agent);
             case AgentAction.TurnLeft:
             case AgentAction.TurnRight: return 20f;
             case AgentAction.Idle: return 5f;
@@ -55,6 +55,14 @@ public class RandomBrain : MonoBehaviour, IAgentBrain
         return 50f * hungerBoost;
     }
 
+    private float MoveForwardWeight(Agent agent)
+    {
+        if (agent.AgentSpecies == Species.Predator)
+            return agent.CurrentEnergy < agent.MaxEnergy * 0.55f ? 65f : 35f;
+
+        return 40f;
+    }
+
     private float EnterShelterWeight(Agent agent, AgentPerception p)
     {
         if (p.VisibleShelters.Count == 0) return 0f;
@@ -65,22 +73,34 @@ public class RandomBrain : MonoBehaviour, IAgentBrain
 
     private float LeaveShelterWeight(Agent agent, AgentPerception p)
     {
-        float threatPenalty = p.VisiblePredators.Count > 0 ? 0.5f : 1f;
-        return 25f * threatPenalty;
+        if (p.VisiblePredators.Count > 0) return 0f;
+
+        float hungerBoost = agent.CurrentEnergy < agent.MaxEnergy * 0.45f ? 2f : 1f;
+        return 12f * hungerBoost;
     }
 
     private float AttackWeight(Agent agent, AgentPerception p)
     {
-        return p.VisiblePrey.Count > 0 ? 70f : 0f;
+        if (p.VisiblePrey.Count == 0) return 0f;
+
+        float hungerBoost = agent.CurrentEnergy < agent.MaxEnergy * 0.75f ? 1.6f : 1f;
+        return 170f * hungerBoost;
     }
 
     private float MateWeight(Agent agent, AgentPerception p)
     {
+        if (!agent.CanReproduce()) return 0f;
+
         int partnerCount = agent.AgentSpecies == Species.Prey
             ? p.VisiblePrey.Count
             : p.VisiblePredators.Count;
 
-        return partnerCount > 0 ? 30f : 0f;
+        if (partnerCount == 0) return 0f;
+
+        float energyRatio = agent.MaxEnergy > 0f ? agent.CurrentEnergy / agent.MaxEnergy : 0f;
+        float energyBoost = energyRatio > 0.8f ? 1.4f : 1f;
+        float speciesBoost = agent.AgentSpecies == Species.Predator ? 1.8f : 1f;
+        return 95f * energyBoost * speciesBoost;
     }
 
     // -------------------------------------------------------------------------

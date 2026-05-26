@@ -18,8 +18,8 @@ MonoBehaviour:
   bodyMass: 1
   moveSpeed: 3
   maxAngularVelocity: 180
-  viewRadius: 8
-  viewAngle: 120
+  viewRadius: 12
+  viewAngle: 150
   maxEnergy: 100
   startEnergy: 80
   passiveEnergyLossPerSecond: 0.8

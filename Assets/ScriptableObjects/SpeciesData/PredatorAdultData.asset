@@ -18,8 +18,8 @@ MonoBehaviour:
   bodyMass: 1
   moveSpeed: 3
   maxAngularVelocity: 180
-  viewRadius: 8
-  viewAngle: 120
+  viewRadius: 14
+  viewAngle: 160
   maxEnergy: 100
   startEnergy: 80
   passiveEnergyLossPerSecond: 0.8
@@ -28,10 +28,10 @@ MonoBehaviour:
   feedingRange: 0
   attackRange: 1.5
   attackEnergyGain: 50
-  matingRange: 2
-  minEnergyToReproduce: 60
-  reproductionEnergyCost: 25
+  matingRange: 5
+  minEnergyToReproduce: 45
+  reproductionEnergyCost: 15
   offspringCount: 1
   offspringBirthEnergy: 50
-  reproductionCooldown: 15
+  reproductionCooldown: 8
   maturityAge: 0

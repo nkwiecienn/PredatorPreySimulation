@@ -48,6 +48,7 @@ public class Agent : MonoBehaviour
     private float age = 0f;
     private bool isInShelter = false;
     private bool isAlive = true;
+    private float reproductionCooldownTimer = 0f;
 
     // -------------------------------------------------------------------------
     // Component references
@@ -81,6 +82,7 @@ public class Agent : MonoBehaviour
     public bool IsInShelter => isInShelter;
     public AgentAction CurrentAction => currentAction;
     public bool IsAlive => isAlive;
+    public bool IsReproductionReady => reproductionCooldownTimer <= 0f;
     public AgentPerception Perception => agentPerception;
     public SpeciesData SpeciesData => speciesData;
 
@@ -123,6 +125,8 @@ public class Agent : MonoBehaviour
         if (!isAlive) return;
 
         decisionTimer -= Time.deltaTime;
+        reproductionCooldownTimer = Mathf.Max(0f, reproductionCooldownTimer - Time.deltaTime);
+
         if (decisionTimer <= 0f)
         {
             decisionTimer = decisionInterval;
@@ -183,7 +187,9 @@ public class Agent : MonoBehaviour
 
     private List<AgentAction> GetAvailableActions()
     {
-        var actions = new List<AgentAction>
+        var actions = isInShelter
+            ? new List<AgentAction> { AgentAction.Idle }
+            : new List<AgentAction>
         {
             AgentAction.TurnRight,
             AgentAction.TurnLeft,
@@ -201,7 +207,7 @@ public class Agent : MonoBehaviour
         if (species == Species.Predator)
             actions.Add(AgentAction.Attack);
 
-        if (lifeStage == LifeStage.Adult)
+        if (lifeStage == LifeStage.Adult && !isInShelter)
             actions.Add(AgentAction.Mate);
 
         return actions;
@@ -261,17 +267,55 @@ public class Agent : MonoBehaviour
 
     private void EnterShelter()
     {
-        // TODO
+        if (agentPerception == null || agentMovement == null) return;
+
+        List<ShelterZone> visible = agentPerception.GetVisibleShelterZones();
+        if (visible.Count == 0) return;
+
+        ShelterZone target = null;
+        float bestDist = float.MaxValue;
+
+        foreach (ShelterZone shelter in visible)
+        {
+            if (shelter == null || !shelter.HasCapacity()) continue;
+
+            float d = Vector3.Distance(transform.position, shelter.transform.position);
+            if (d < bestDist)
+            {
+                bestDist = d;
+                target = shelter;
+            }
+        }
+
+        if (target == null) return;
+
+        if (target.IsAgentInside(this))
+        {
+            Idle();
+            return;
+        }
+
+        agentMovement.MoveTowards(target.transform.position);
     }
 
     private void LeaveShelter()
     {
-        // TODO
+        if (agentMovement == null)
+        {
+            SetInShelter(false);
+            return;
+        }
+
+        ShelterZone currentShelter = FindCurrentShelter();
+        if (currentShelter != null)
+            agentMovement.MoveAwayFrom(currentShelter.transform.position);
+        else
+            SetInShelter(false);
     }
 
     private void Attack()
     {
-        if (agentPerception == null) return;
+        if (agentPerception == null || agentMovement == null) return;
 
         List<Agent> visible = agentPerception.GetVisiblePreyAgents();
         if (visible.Count == 0) return;
@@ -284,7 +328,15 @@ public class Agent : MonoBehaviour
         {
             if (prey == null || !prey.IsAlive || prey.IsInShelter) continue;
             float d = Vector3.Distance(transform.position, prey.transform.position);
-            if (d <= attackRange && d < best) { best = d; target = prey; }
+            if (d < best) { best = d; target = prey; }
+        }
+
+        if (target == null) return;
+
+        if (best > attackRange)
+        {
+            agentMovement.MoveTowards(target.transform.position);
+            return;
         }
 
         if (target != null)
@@ -299,10 +351,11 @@ public class Agent : MonoBehaviour
 
     private void Mate()
     {
-        if (agentPerception == null) return;
+        if (agentPerception == null || agentMovement == null) return;
 
         float minEnergy = speciesData != null ? speciesData.MinEnergyToReproduce : 60f;
         if (currentEnergy < minEnergy) return;
+        if (!CanReproduce()) return;
 
         List<Agent> visible = species == Species.Prey
             ? agentPerception.GetVisiblePreyAgents()
@@ -320,14 +373,30 @@ public class Agent : MonoBehaviour
             if (!candidate.IsAlive) continue;
             if (candidate.AgentSpecies != species) continue;
             if (candidate.AgentLifeStage != LifeStage.Adult) continue;
-            if (candidate.CurrentEnergy < minEnergy) continue;
+            if (!candidate.CanReproduce()) continue;
+            if (candidate.IsInShelter) continue;
 
             float d = Vector3.Distance(transform.position, candidate.transform.position);
-            if (d <= matingRange && d < best) { best = d; partner = candidate; }
+            if (d < best) { best = d; partner = candidate; }
         }
 
-        if (partner != null)
-            SimulationManager.Instance.SpawnOffspring(this, partner);
+        if (partner == null) return;
+
+        if (best > matingRange)
+        {
+            agentMovement.MoveTowards(partner.transform.position);
+            return;
+        }
+
+        Agent offspring = SimulationManager.Instance != null
+            ? SimulationManager.Instance.SpawnOffspring(this, partner)
+            : null;
+
+        if (offspring != null)
+        {
+            BeginReproductionCooldown();
+            partner.BeginReproductionCooldown();
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -397,10 +466,18 @@ public class Agent : MonoBehaviour
 
     public void SetAgentId(string id) => agentId = id;
 
+    public void BeginReproductionCooldown()
+    {
+        reproductionCooldownTimer = speciesData != null ? speciesData.ReproductionCooldown : 15f;
+    }
+
     public bool CanReproduce()
     {
         return lifeStage == LifeStage.Adult
             && speciesData != null
+            && isAlive
+            && !isInShelter
+            && reproductionCooldownTimer <= 0f
             && currentEnergy >= speciesData.MinEnergyToReproduce;
     }
 
@@ -442,6 +519,18 @@ public class Agent : MonoBehaviour
             rb.mass = bodyMass;
             rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         }
+    }
+
+    private ShelterZone FindCurrentShelter()
+    {
+        ShelterZone[] shelters = FindObjectsByType<ShelterZone>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        foreach (ShelterZone shelter in shelters)
+        {
+            if (shelter != null && shelter.IsAgentInside(this))
+                return shelter;
+        }
+
+        return null;
     }
 
 }
