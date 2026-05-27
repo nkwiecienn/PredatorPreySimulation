@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RandomBrain : MonoBehaviour, IAgentBrain
+public class RandomBrain : MonoBehaviour
 {
     public AgentAction DecideAction(Agent agent, List<AgentAction> validActions)
     {

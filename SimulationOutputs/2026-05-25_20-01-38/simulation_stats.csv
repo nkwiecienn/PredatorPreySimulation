@@ -1,0 +1,11 @@
+﻿time,totalAgents,preyCount,predatorCount,preyJuvenileCount,preyAdultCount,predatorJuvenileCount,predatorAdultCount,avgPreyEnergy,avgPredatorEnergy,minPreyEnergy,maxPreyEnergy,minPredatorEnergy,maxPredatorEnergy,totalBirths,totalDeaths,totalKills,availableGrassPatches,totalGrassPatches,totalGrassFood,maxGrassFood,shelterOccupancy,shelterCapacity
+0.02,40,32,8,11,21,3,5,80,80,80,80,80,80,0,0,0,6,6,600,600,0,0
+1.025,40,32,8,11,21,3,5,80,80,80,80,80,80,0,0,0,6,6,600,600,0,0
+2.038,40,32,8,11,21,3,5,80,80,80,80,80,80,0,0,0,6,6,600,600,0,0
+3.054,40,32,8,11,21,3,5,80,80,80,80,80,80,0,0,0,6,6,600,600,0,0
+4.068,40,32,8,11,21,3,5,80,80,80,80,80,80,0,0,0,6,6,600,600,0,0
+5.07,40,32,8,11,21,3,5,80,80,80,80,80,80,0,0,0,6,6,600,600,0,0
+6.073,40,32,8,11,21,3,5,80,80,80,80,80,80,0,0,0,6,6,600,600,0,0
+7.078,40,32,8,11,21,3,5,80,80,80,80,80,80,0,0,0,6,6,600,600,0,0
+8.082,40,32,8,11,21,3,5,80,80,80,80,80,80,0,0,0,6,6,600,600,0,0
+9.039,40,32,8,11,21,3,5,80,80,80,80,80,80,0,0,0,6,6,600,600,0,0

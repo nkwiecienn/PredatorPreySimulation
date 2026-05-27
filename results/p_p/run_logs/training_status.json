@@ -1,0 +1,51 @@
+{
+    "Prey": {
+        "checkpoints": [
+            {
+                "steps": 12288,
+                "file_path": "results/p_p/Prey/Prey-12288.onnx",
+                "reward": null,
+                "creation_time": 1779802761.6699717,
+                "auxillary_file_paths": [
+                    "results/p_p/Prey/Prey-12288.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 12288,
+            "file_path": "results/p_p/Prey.onnx",
+            "reward": null,
+            "creation_time": 1779802761.6699717,
+            "auxillary_file_paths": [
+                "results/p_p/Prey/Prey-12288.pt"
+            ]
+        }
+    },
+    "Predator": {
+        "checkpoints": [
+            {
+                "steps": 3072,
+                "file_path": "results/p_p/Predator/Predator-3072.onnx",
+                "reward": null,
+                "creation_time": 1779802761.7445753,
+                "auxillary_file_paths": [
+                    "results/p_p/Predator/Predator-3072.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 3072,
+            "file_path": "results/p_p/Predator.onnx",
+            "reward": null,
+            "creation_time": 1779802761.7445753,
+            "auxillary_file_paths": [
+                "results/p_p/Predator/Predator-3072.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.2.0.dev0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

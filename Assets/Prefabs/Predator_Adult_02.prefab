@@ -17,6 +17,8 @@ GameObject:
   - component: {fileID: 5599114851256274285}
   - component: {fileID: 6628795338568698043}
   - component: {fileID: 4113054372663961218}
+  - component: {fileID: 5478012485290580618}
+  - component: {fileID: 7184901742505761975}
   m_Layer: 6
   m_Name: Predator_Adult_02
   m_TagString: Untagged
@@ -156,10 +158,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55d6dd18708adfed7847f4a0ff8c480e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Agent
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 3000
   agentId: Predator_02
   speciesData: {fileID: 11400000, guid: c744bb4076aae37c4b72f66e2cd43a48, type: 2}
   adultSpeciesData: {fileID: 0}
-  decisionInterval: 0.5
+  CurrentEpisode: 0
+  CumulativeReward: 0
 --- !u!114 &5599114851256274285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -189,6 +196,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 960
   rayHeightOffset: 0.5
+  viewRadius: 0
 --- !u!114 &4113054372663961218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,3 +209,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 935c1748203bfb9d78a0c0b3b394ac7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RandomBrain
+--- !u!114 &5478012485290580618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105929208991118612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.Policies.BehaviorParameters
+  m_BrainParameters:
+    VectorObservationSize: 5
+    NumStackedVectorObservations: 1
+    m_ActionSpec:
+      m_NumContinuousActions: 0
+      BranchSizes: 06000000
+    VectorActionSize: 06000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 0
+    hasUpgradedBrainParametersWithActionSpec: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_BehaviorType: 0
+  m_BehaviorName: Predator
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_DeterministicInference: 0
+  m_ObservableAttributeHandling: 0
+--- !u!114 &7184901742505761975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105929208991118612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.DecisionRequester
+  DecisionPeriod: 5
+  DecisionStep: 0
+  TakeActionsBetweenDecisions: 1

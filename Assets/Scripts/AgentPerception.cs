@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.MLAgents.Sensors;
+
 
 [RequireComponent(typeof(Agent))]
 public class AgentPerception : MonoBehaviour
@@ -12,7 +14,7 @@ public class AgentPerception : MonoBehaviour
              "Set to ~half the agent capsule height so rays aren't fired from ground level.")]
     [SerializeField] private float rayHeightOffset = 0.5f;
 
-    private float viewRadius;
+    public float viewRadius;
     private float viewAngle;
 
     private readonly List<PerceptionObject> visibleObjects = new List<PerceptionObject>();
@@ -45,6 +47,15 @@ public class AgentPerception : MonoBehaviour
     public List<PerceptionObject> VisiblePredators => visiblePredators;
     public List<PerceptionObject> VisiblePrey => visiblePrey;
     public List<PerceptionObject> VisibleObstacles => visibleObstacles;
+
+    public Vector3 GetRelativePositionTo(Transform target, Transform agentTransform)
+{
+    if (target == null || agentTransform == null) return Vector3.zero;
+
+
+    return agentTransform.InverseTransformPoint(target.position);
+}
+
 
     public List<GrassPatch> GetVisibleGrassPatches()
     {
@@ -113,7 +124,7 @@ public class AgentPerception : MonoBehaviour
         {
             float t = count > 1 ? (float)i / (count - 1) : 0.5f;
             float rayAngle = Mathf.Lerp(-viewAngle * 0.5f, viewAngle * 0.5f, t);
-            Vector3 dir = Quaternion.Euler(-20f, rayAngle, 0f) * transform.forward;
+            Vector3 dir = Quaternion.Euler(0f, rayAngle, 0f) * transform.forward;
 
             RaycastHit[] hits = Physics.RaycastAll(rayOrigin, dir, viewRadius, detectableLayers);
 

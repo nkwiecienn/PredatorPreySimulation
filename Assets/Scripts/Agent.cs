@@ -1,5 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 
 public enum Species { Predator, Prey }
 public enum LifeStage { Juvenile, Adult }
@@ -13,7 +16,7 @@ public enum AgentAction
 }
 
 [RequireComponent(typeof(Rigidbody))]
-public class Agent : MonoBehaviour
+public class Agent : Unity.MLAgents.Agent
 {
     // -------------------------------------------------------------------------
     // Inspector fields
@@ -25,9 +28,12 @@ public class Agent : MonoBehaviour
 
     [Header("Lifecycle — assign adult data so Mature() works without Resources.Load")]
     [SerializeField] private SpeciesData adultSpeciesData;
+    [HideInInspector] public int CurrentEpisode = 0;
+    [HideInInspector] public float CumulativeReward = 0f;
 
-    [Header("Decision Making")]
-    [SerializeField] private float decisionInterval = 0.5f;
+
+    //[Header("Decision Making")]
+    //[SerializeField] private float decisionInterval = 0.5f;
 
     // -------------------------------------------------------------------------
     // Runtime state (initialised from SpeciesData in Awake)
@@ -56,7 +62,7 @@ public class Agent : MonoBehaviour
     private Rigidbody rb;
     private AgentMovement agentMovement;
     private AgentPerception agentPerception;
-    private IAgentBrain brain;
+    //private IAgentBrain brain;
     private AgentAction currentAction = AgentAction.Idle;
     private float decisionTimer = 0f;
 
@@ -88,8 +94,9 @@ public class Agent : MonoBehaviour
     // Unity lifecycle
     // -------------------------------------------------------------------------
 
-    private void Awake()
+    public override void Initialize()
     {
+
         rb = GetComponent<Rigidbody>();
         agentMovement = GetComponent<AgentMovement>();
         agentPerception = GetComponent<AgentPerception>();
@@ -101,42 +108,33 @@ public class Agent : MonoBehaviour
 
         DebugLogger.LogAgentInit(agentId, speciesData?.Species.ToString() ?? "Unknown",
                                 speciesData?.LifeStage.ToString() ?? "Unknown");
+        
+        CurrentEpisode = 0;
+        CumulativeReward = 0f;
     }
 
-    private void Start()
+    public override void OnEpisodeBegin()
     {
+        CurrentEpisode++; 
+        CumulativeReward = 0f;
+
         if (agentMovement != null)
             agentMovement.Initialize(moveSpeed, maxAngularVelocity);
 
         if (agentPerception != null)
             agentPerception.Initialize(viewRadius, viewAngle);
 
-        brain = GetComponent<IAgentBrain>();
-        decisionTimer = decisionInterval;
+        //brain = GetComponent<IAgentBrain>();
+        //decisionTimer = decisionInterval;
 
         if (SimulationManager.Instance != null)
             SimulationManager.Instance.RegisterAgent(this);
+
+
     }
 
-    private void Update()
-    {
-        if (!isAlive) return;
 
-        decisionTimer -= Time.deltaTime;
-        if (decisionTimer <= 0f)
-        {
-            decisionTimer = decisionInterval;
-            MakeDecision();
-        }
-
-        TickLifecycle(Time.deltaTime);
-    }
-
-    private void FixedUpdate()
-    {
-        if (!isAlive) return;
-        agentMovement?.ApplyMovement();
-    }
+    
 
     private void OnValidate()
     {
@@ -147,7 +145,7 @@ public class Agent : MonoBehaviour
         viewRadius = Mathf.Max(0f, viewRadius);
         currentEnergy = Mathf.Max(0f, currentEnergy);
         passiveEnergyLossPerSecond = Mathf.Max(0f, passiveEnergyLossPerSecond);
-        decisionInterval = Mathf.Max(0.1f, decisionInterval);
+ 
 
         ApplyPhysicalSettings();
     }
@@ -167,18 +165,80 @@ public class Agent : MonoBehaviour
     // -------------------------------------------------------------------------
     // Decision loop
     // -------------------------------------------------------------------------
+    
+public override void CollectObservations(VectorSensor sensor)
+{
+  
+    AddClosestObjectObservation(sensor, agentPerception.VisibleGrass);
 
-    private void MakeDecision()
+    AddClosestObjectObservation(sensor, agentPerception.VisibleShelters);
+
+    AddClosestObjectObservation(sensor, agentPerception.VisiblePredators);
+
+    AddClosestObjectObservation(sensor, agentPerception.VisiblePrey);
+
+    AddClosestObjectObservation(sensor, agentPerception.VisibleObstacles);
+}
+
+
+private void AddClosestObjectObservation(VectorSensor sensor, List<PerceptionObject> objectsList)
+{
+    if (objectsList != null && objectsList.Count > 0)
     {
-        agentPerception?.UpdatePerception();
+        objectsList.Sort((a, b) => a.distance.CompareTo(b.distance));
+        PerceptionObject closest = objectsList[0];
+        
+        Vector3 relativePos = agentPerception.GetRelativePositionTo(closest.gameObject.transform, this.gameObject.transform);
+        float maxDistance = agentPerception.viewRadius;
+        if (maxDistance <= 0) maxDistance = 1f;
 
-        List<AgentAction> validActions = GetAvailableActions();
+        Vector3 normalizedPos = relativePos / maxDistance;
 
-        currentAction = (brain != null && validActions.Count > 0)
-            ? brain.DecideAction(this, validActions)
-            : AgentAction.Idle;
+        sensor.AddObservation(normalizedPos.x);
+        sensor.AddObservation(normalizedPos.z);
+    }
+    else
+    {
+        sensor.AddObservation(0f);
+        sensor.AddObservation(0f);
+    }
+}
 
-        ExecuteAction(currentAction);
+    public override void OnActionReceived(ActionBuffers actions)
+    {
+        agentMovement?.ResetMovement();
+        AgentAction chosenAction = (AgentAction)actions.DiscreteActions[0];
+        ExecuteAction(chosenAction);
+        agentMovement?.ApplyMovement();
+        if (species == Species.Predator && chosenAction != AgentAction.Attack)
+        {
+            if (lifeStage == LifeStage.Juvenile)
+            {
+                AddReward(-0.5f / MaxStep);
+                CumulativeReward = GetCumulativeReward(); 
+            }
+            else
+            {
+                AddReward(-1f / MaxStep);
+                CumulativeReward = GetCumulativeReward();  
+            }
+
+        }
+        if (species == Species.Prey)
+        {
+            if (lifeStage == LifeStage.Juvenile)
+            {
+                AddReward(0.1f / MaxStep);
+                CumulativeReward = GetCumulativeReward(); 
+            }
+            else
+            {
+                AddReward(0.2f / MaxStep);
+                CumulativeReward = GetCumulativeReward();  
+            }
+
+        }
+
     }
 
     private List<AgentAction> GetAvailableActions()
@@ -210,7 +270,6 @@ public class Agent : MonoBehaviour
     private void ExecuteAction(AgentAction action)
     {
         DebugLogger.LogAgentAction(agentId, action);
-
         switch (action)
         {
             case AgentAction.TurnLeft: TurnLeft(); break;
@@ -240,10 +299,13 @@ public class Agent : MonoBehaviour
 
     private void EatGrass()
     {
+        
         if (agentPerception == null) return;
 
         List<GrassPatch> visible = agentPerception.GetVisibleGrassPatches();
+        
         if (visible.Count == 0) return;
+        if (visible.Count == 0) Debug.Log($"{gameObject.name} visible count of grass: {visible.Count}");
 
         float feedRange = speciesData != null ? speciesData.FeedingRange : 2f;
         GrassPatch best = null;
@@ -256,17 +318,34 @@ public class Agent : MonoBehaviour
             if (d <= feedRange && d < bestDist) { bestDist = d; best = g; }
         }
 
-        best?.Eat(this);
+if (best != null)
+        {
+            best.Eat(this); 
+            DebugLogger.LogPreyAte(agentId);
+            AddReward(1.5f); 
+            CumulativeReward = GetCumulativeReward();
+        }
+        else
+        {
+            AddReward(-0.01f); 
+        }
+
     }
+
+    
 
     private void EnterShelter()
     {
         // TODO
+        AddReward(-0.1f / MaxStep);
+        CumulativeReward = GetCumulativeReward(); 
     }
 
     private void LeaveShelter()
     {
         // TODO
+        AddReward(-0.1f / MaxStep);
+        CumulativeReward = GetCumulativeReward(); 
     }
 
     private void Attack()
@@ -274,7 +353,9 @@ public class Agent : MonoBehaviour
         if (agentPerception == null) return;
 
         List<Agent> visible = agentPerception.GetVisiblePreyAgents();
+        
         if (visible.Count == 0) return;
+        if (visible.Count != 0)Debug.Log($" {gameObject.name} visible count of prey: {visible.Count}");
 
         float attackRange = speciesData != null ? speciesData.AttackRange : 1.5f;
         Agent target = null;
@@ -282,6 +363,8 @@ public class Agent : MonoBehaviour
 
         foreach (Agent prey in visible)
         {
+            AddReward(0.25f);
+            CumulativeReward = GetCumulativeReward();
             if (prey == null || !prey.IsAlive || prey.IsInShelter) continue;
             float d = Vector3.Distance(transform.position, prey.transform.position);
             if (d <= attackRange && d < best) { best = d; target = prey; }
@@ -291,6 +374,9 @@ public class Agent : MonoBehaviour
         {
             float gain = speciesData != null ? speciesData.AttackEnergyGain : 50f;
             target.Die(DeathCause.Predation);
+            AddReward(1.0f);
+            CumulativeReward = GetCumulativeReward();
+            EndEpisode();
             RestoreEnergy(gain);
             DebugLogger.LogAgentKill(agentId, target.AgentId);
             DebugLogger.LogAgentEnergy(agentId, currentEnergy, maxEnergy, "after kill");
@@ -316,6 +402,8 @@ public class Agent : MonoBehaviour
 
         foreach (Agent candidate in visible)
         {
+            AddReward(0.1f);
+            CumulativeReward = GetCumulativeReward();
             if (candidate == null || candidate == this) continue;
             if (!candidate.IsAlive) continue;
             if (candidate.AgentSpecies != species) continue;
@@ -328,6 +416,8 @@ public class Agent : MonoBehaviour
 
         if (partner != null)
             SimulationManager.Instance.SpawnOffspring(this, partner);
+            AddReward(0.2f);
+            CumulativeReward = GetCumulativeReward();
     }
 
     // -------------------------------------------------------------------------
@@ -389,6 +479,14 @@ public class Agent : MonoBehaviour
         isAlive = false;
 
         SimulationManager.Instance?.UnregisterAgent(this, cause);
+        if (cause == DeathCause.Predation || cause == DeathCause.Starvation)
+        {
+            AddReward(-1.0f);
+            CumulativeReward = GetCumulativeReward();
+            EndEpisode();
+        }
+
+
         DebugLogger.LogAgentDeath(agentId, cause);
         Destroy(gameObject);
     }

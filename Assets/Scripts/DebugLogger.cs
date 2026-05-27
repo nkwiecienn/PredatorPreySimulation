@@ -41,7 +41,12 @@ public static class DebugLogger
         if (!enableAgentLogs || !ShouldLog(LogLevel.Info)) return;
         Debug.Log($"[AGENT] {agentId} matured to Adult");
     }
-
+    
+        public static void LogPreyAte(string agentId)
+    {
+        if (!enableAgentLogs || !ShouldLog(LogLevel.Info)) return;
+        Debug.Log($"[AGENT] {agentId} ate grass");
+    }
     public static void LogAgentDeath(string agentId, DeathCause cause)
     {
         if (!enableAgentLogs || !ShouldLog(LogLevel.Info)) return;

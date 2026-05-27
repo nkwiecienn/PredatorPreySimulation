@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 89316394}
   - component: {fileID: 89316393}
   - component: {fileID: 89316397}
+  - component: {fileID: 89316398}
   m_Layer: 8
   m_Name: Grass (5)
   m_TagString: Untagged
@@ -154,11 +155,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &89316394
@@ -250,6 +251,27 @@ MonoBehaviour:
   regrowAmountPerSecond: 2
   fullGrassMaterial: {fileID: 2100000, guid: caceef3c520df584b8d507610f9c2b87, type: 2}
   emptyGrassMaterial: {fileID: 2100000, guid: 77106f08652b99b4b9250f3d3b25a8dc, type: 2}
+--- !u!65 &89316398
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 89316392}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 4, z: 2}
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!1 &284909027
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,6 +680,11 @@ MonoBehaviour:
   preyJuvenilePrefab: {fileID: 2157900798462324839, guid: 606f0afeb16d0b00195b6572d0988ee4, type: 3}
   predatorJuvenilePrefab: {fileID: 3630862508182666038, guid: b48fe727cddf8b71896d0ba290b50fe1, type: 3}
   statisticsReportInterval: 5
+  exportChartsOnStop: 1
+  dataSampleInterval: 1
+  outputFolderName: SimulationOutputs
+  pythonExecutable: python
+  chartGeneratorScript: Assets/Scripts/Python/generate_simulation_charts.py
 --- !u!4 &949202940
 Transform:
   m_ObjectHideFlags: 0
@@ -798,6 +825,7 @@ GameObject:
   - component: {fileID: 1068222222}
   - component: {fileID: 1068222221}
   - component: {fileID: 1068222225}
+  - component: {fileID: 1068222226}
   m_Layer: 8
   m_Name: Grass (3)
   m_TagString: Untagged
@@ -820,11 +848,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1068222222
@@ -916,6 +944,27 @@ MonoBehaviour:
   regrowAmountPerSecond: 2
   fullGrassMaterial: {fileID: 2100000, guid: caceef3c520df584b8d507610f9c2b87, type: 2}
   emptyGrassMaterial: {fileID: 2100000, guid: 77106f08652b99b4b9250f3d3b25a8dc, type: 2}
+--- !u!65 &1068222226
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068222220}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 4, z: 2}
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!1 &1108780415
 GameObject:
   m_ObjectHideFlags: 0
@@ -1105,6 +1154,7 @@ GameObject:
   - component: {fileID: 1406634596}
   - component: {fileID: 1406634595}
   - component: {fileID: 1406634599}
+  - component: {fileID: 1406634600}
   m_Layer: 8
   m_Name: Grass
   m_TagString: Untagged
@@ -1127,11 +1177,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1406634596
@@ -1223,6 +1273,27 @@ MonoBehaviour:
   regrowAmountPerSecond: 2
   fullGrassMaterial: {fileID: 2100000, guid: 3f67efe581643214ea62e132b9a1ab3f, type: 2}
   emptyGrassMaterial: {fileID: 2100000, guid: 77106f08652b99b4b9250f3d3b25a8dc, type: 2}
+--- !u!65 &1406634600
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1406634594}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 4, z: 2}
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!1 &1508522559
 GameObject:
   m_ObjectHideFlags: 0
@@ -1424,6 +1495,7 @@ GameObject:
   - component: {fileID: 1701539881}
   - component: {fileID: 1701539880}
   - component: {fileID: 1701539884}
+  - component: {fileID: 1701539885}
   m_Layer: 8
   m_Name: Grass (2)
   m_TagString: Untagged
@@ -1446,11 +1518,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1701539881
@@ -1542,6 +1614,27 @@ MonoBehaviour:
   regrowAmountPerSecond: 2
   fullGrassMaterial: {fileID: 2100000, guid: caceef3c520df584b8d507610f9c2b87, type: 2}
   emptyGrassMaterial: {fileID: 2100000, guid: 77106f08652b99b4b9250f3d3b25a8dc, type: 2}
+--- !u!65 &1701539885
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1701539879}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 4, z: 2}
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!1 &1879746155
 GameObject:
   m_ObjectHideFlags: 0
@@ -1555,6 +1648,7 @@ GameObject:
   - component: {fileID: 1879746157}
   - component: {fileID: 1879746156}
   - component: {fileID: 1879746160}
+  - component: {fileID: 1879746161}
   m_Layer: 8
   m_Name: Grass (4)
   m_TagString: Untagged
@@ -1577,11 +1671,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1879746157
@@ -1673,6 +1767,27 @@ MonoBehaviour:
   regrowAmountPerSecond: 2
   fullGrassMaterial: {fileID: 2100000, guid: caceef3c520df584b8d507610f9c2b87, type: 2}
   emptyGrassMaterial: {fileID: 2100000, guid: 77106f08652b99b4b9250f3d3b25a8dc, type: 2}
+--- !u!65 &1879746161
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1879746155}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 4, z: 2}
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!1 &1902186542
 GameObject:
   m_ObjectHideFlags: 0
@@ -1986,6 +2101,7 @@ GameObject:
   - component: {fileID: 1984648000}
   - component: {fileID: 1984647999}
   - component: {fileID: 1984648003}
+  - component: {fileID: 1984648004}
   m_Layer: 8
   m_Name: Grass (1)
   m_TagString: Untagged
@@ -2008,11 +2124,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1984648000
@@ -2104,6 +2220,27 @@ MonoBehaviour:
   regrowAmountPerSecond: 2
   fullGrassMaterial: {fileID: 2100000, guid: 3f67efe581643214ea62e132b9a1ab3f, type: 2}
   emptyGrassMaterial: {fileID: 2100000, guid: 77106f08652b99b4b9250f3d3b25a8dc, type: 2}
+--- !u!65 &1984648004
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1984647998}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 4, z: 2}
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!1 &2025629899
 GameObject:
   m_ObjectHideFlags: 0
