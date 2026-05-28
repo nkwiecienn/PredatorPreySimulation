@@ -54,6 +54,7 @@ public class Agent : Unity.MLAgents.Agent
     private float age = 0f;
     private bool isInShelter = false;
     private bool isAlive = true;
+    private float reproductionCooldownTimer = 0f;
 
     // -------------------------------------------------------------------------
     // Component references
@@ -89,7 +90,7 @@ public class Agent : Unity.MLAgents.Agent
     public bool IsAlive => isAlive;
     public AgentPerception Perception => agentPerception;
     public SpeciesData SpeciesData => speciesData;
-
+    public bool IsReproductionReady => reproductionCooldownTimer <= 0f;
     // -------------------------------------------------------------------------
     // Unity lifecycle
     // -------------------------------------------------------------------------
@@ -113,25 +114,24 @@ public class Agent : Unity.MLAgents.Agent
         CumulativeReward = 0f;
     }
 
-    public override void OnEpisodeBegin()
-    {
-        CurrentEpisode++; 
-        CumulativeReward = 0f;
+public override void OnEpisodeBegin()
+{
+    CurrentEpisode++; 
+    CumulativeReward = 0f;
 
-        if (agentMovement != null)
-            agentMovement.Initialize(moveSpeed, maxAngularVelocity);
-
-        if (agentPerception != null)
-            agentPerception.Initialize(viewRadius, viewAngle);
-
-        //brain = GetComponent<IAgentBrain>();
-        //decisionTimer = decisionInterval;
-
-        if (SimulationManager.Instance != null)
-            SimulationManager.Instance.RegisterAgent(this);
+    currentEnergy = maxEnergy; 
+    isAlive = true;
 
 
-    }
+    if (agentMovement != null)
+        agentMovement.Initialize(moveSpeed, maxAngularVelocity);
+
+    if (agentPerception != null)
+        agentPerception.Initialize(viewRadius, viewAngle);
+
+    if (SimulationManager.Instance != null)
+        SimulationManager.Instance.RegisterAgent(this);
+}
 
 
     
@@ -168,6 +168,7 @@ public class Agent : Unity.MLAgents.Agent
     
 public override void CollectObservations(VectorSensor sensor)
 {
+    agentPerception?.UpdatePerception();
   
     AddClosestObjectObservation(sensor, agentPerception.VisibleGrass);
 
@@ -206,20 +207,21 @@ private void AddClosestObjectObservation(VectorSensor sensor, List<PerceptionObj
 
     public override void OnActionReceived(ActionBuffers actions)
     {
+        agentPerception?.UpdatePerception();
         agentMovement?.ResetMovement();
         AgentAction chosenAction = (AgentAction)actions.DiscreteActions[0];
         ExecuteAction(chosenAction);
         agentMovement?.ApplyMovement();
-        if (species == Species.Predator && chosenAction != AgentAction.Attack)
+        if (species == Species.Predator && chosenAction != AgentAction.Attack && chosenAction != AgentAction.Mate)
         {
             if (lifeStage == LifeStage.Juvenile)
             {
-                AddReward(-0.5f / MaxStep);
+                AddReward(-0.00005f);
                 CumulativeReward = GetCumulativeReward(); 
             }
             else
             {
-                AddReward(-1f / MaxStep);
+                AddReward(-0.0001f);
                 CumulativeReward = GetCumulativeReward();  
             }
 
@@ -228,22 +230,44 @@ private void AddClosestObjectObservation(VectorSensor sensor, List<PerceptionObj
         {
             if (lifeStage == LifeStage.Juvenile)
             {
-                AddReward(0.1f / MaxStep);
+                AddReward(0.0005f);
                 CumulativeReward = GetCumulativeReward(); 
             }
             else
             {
-                AddReward(0.2f / MaxStep);
+                AddReward(0.001f);
                 CumulativeReward = GetCumulativeReward();  
             }
 
         }
 
     }
+    
+    public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
+{
+    if (species == Species.Prey) actionMask.SetActionEnabled(0, (int)AgentAction.Attack, false);
 
+    if (isInShelter)
+    {
+        actionMask.SetActionEnabled(0, (int)AgentAction.MoveForward, false);
+        actionMask.SetActionEnabled(0, (int)AgentAction.TurnLeft, false);
+        actionMask.SetActionEnabled(0, (int)AgentAction.TurnRight, false);
+        actionMask.SetActionEnabled(0, (int)AgentAction.Mate, false);
+        actionMask.SetActionEnabled(0, (int)AgentAction.EatGrass, false);
+    }
+    if (species == Species.Predator)
+        {
+            actionMask.SetActionEnabled(0, (int)AgentAction.EatGrass, false);
+            actionMask.SetActionEnabled(0, (int)AgentAction.EnterShelter, false);
+            actionMask.SetActionEnabled(0, (int)AgentAction.LeaveShelter, false);
+        } 
+    if (lifeStage == LifeStage.Juvenile) actionMask.SetActionEnabled(0, (int)AgentAction.Mate, false);
+}
     private List<AgentAction> GetAvailableActions()
     {
-        var actions = new List<AgentAction>
+        var actions = isInShelter
+            ? new List<AgentAction> { AgentAction.Idle }
+            : new List<AgentAction>
         {
             AgentAction.TurnRight,
             AgentAction.TurnLeft,
@@ -261,7 +285,7 @@ private void AddClosestObjectObservation(VectorSensor sensor, List<PerceptionObj
         if (species == Species.Predator)
             actions.Add(AgentAction.Attack);
 
-        if (lifeStage == LifeStage.Adult)
+        if (lifeStage == LifeStage.Adult && !isInShelter)
             actions.Add(AgentAction.Mate);
 
         return actions;
@@ -305,7 +329,7 @@ private void AddClosestObjectObservation(VectorSensor sensor, List<PerceptionObj
         List<GrassPatch> visible = agentPerception.GetVisibleGrassPatches();
         
         if (visible.Count == 0) return;
-        if (visible.Count == 0) Debug.Log($"{gameObject.name} visible count of grass: {visible.Count}");
+  
 
         float feedRange = speciesData != null ? speciesData.FeedingRange : 2f;
         GrassPatch best = null;
@@ -322,12 +346,7 @@ if (best != null)
         {
             best.Eat(this); 
             DebugLogger.LogPreyAte(agentId);
-            AddReward(1.5f); 
-            CumulativeReward = GetCumulativeReward();
-        }
-        else
-        {
-            AddReward(-0.01f); 
+
         }
 
     }
@@ -336,26 +355,62 @@ if (best != null)
 
     private void EnterShelter()
     {
-        // TODO
-        AddReward(-0.1f / MaxStep);
-        CumulativeReward = GetCumulativeReward(); 
+
+        if (agentPerception == null || agentMovement == null) return;
+
+        List<ShelterZone> visible = agentPerception.GetVisibleShelterZones();
+        if (visible.Count == 0) return;
+
+        ShelterZone target = null;
+        float bestDist = float.MaxValue;
+
+        foreach (ShelterZone shelter in visible)
+        {
+            if (shelter == null || !shelter.HasCapacity()) continue;
+
+            float d = Vector3.Distance(transform.position, shelter.transform.position);
+            if (d < bestDist)
+            {
+                bestDist = d;
+                target = shelter;
+            }
+        }
+
+        if (target == null) return;
+
+        if (target.IsAgentInside(this))
+        {
+            Idle();
+            return;
+        }
+
+        agentMovement.MoveTowards(target.transform.position); 
     }
 
     private void LeaveShelter()
     {
         // TODO
-        AddReward(-0.1f / MaxStep);
-        CumulativeReward = GetCumulativeReward(); 
+        if (agentMovement == null)
+        {
+            SetInShelter(false);
+            return;
+        }
+
+        ShelterZone currentShelter = FindCurrentShelter();
+        if (currentShelter != null)
+            agentMovement.MoveAwayFrom(currentShelter.transform.position);
+        else
+            SetInShelter(false);
     }
 
     private void Attack()
     {
-        if (agentPerception == null) return;
+        if (agentPerception == null || agentMovement == null) return;
 
         List<Agent> visible = agentPerception.GetVisiblePreyAgents();
         
         if (visible.Count == 0) return;
-        if (visible.Count != 0)Debug.Log($" {gameObject.name} visible count of prey: {visible.Count}");
+
 
         float attackRange = speciesData != null ? speciesData.AttackRange : 1.5f;
         Agent target = null;
@@ -363,11 +418,17 @@ if (best != null)
 
         foreach (Agent prey in visible)
         {
-            AddReward(0.25f);
-            CumulativeReward = GetCumulativeReward();
             if (prey == null || !prey.IsAlive || prey.IsInShelter) continue;
             float d = Vector3.Distance(transform.position, prey.transform.position);
-            if (d <= attackRange && d < best) { best = d; target = prey; }
+            if (d < best) { best = d; target = prey; }
+        }
+
+        if (target == null) return;
+
+        if (best > attackRange)
+        {
+            agentMovement.MoveTowards(target.transform.position);
+            return;
         }
 
         if (target != null)
@@ -385,10 +446,11 @@ if (best != null)
 
     private void Mate()
     {
-        if (agentPerception == null) return;
+        if (agentPerception == null || agentMovement == null) return;
 
         float minEnergy = speciesData != null ? speciesData.MinEnergyToReproduce : 60f;
         if (currentEnergy < minEnergy) return;
+        if (!CanReproduce()) return;
 
         List<Agent> visible = species == Species.Prey
             ? agentPerception.GetVisiblePreyAgents()
@@ -408,18 +470,32 @@ if (best != null)
             if (!candidate.IsAlive) continue;
             if (candidate.AgentSpecies != species) continue;
             if (candidate.AgentLifeStage != LifeStage.Adult) continue;
-            if (candidate.CurrentEnergy < minEnergy) continue;
+            if (!candidate.CanReproduce()) continue;
+            if (candidate.IsInShelter) continue;
 
             float d = Vector3.Distance(transform.position, candidate.transform.position);
-            if (d <= matingRange && d < best) { best = d; partner = candidate; }
+            if (d < best) { best = d; partner = candidate; }
         }
 
-        if (partner != null)
-            SimulationManager.Instance.SpawnOffspring(this, partner);
-            AddReward(0.2f);
-            CumulativeReward = GetCumulativeReward();
-    }
+        if (partner == null) return;
 
+        if (best > matingRange)
+        {
+            agentMovement.MoveTowards(partner.transform.position);
+            return;
+        }
+
+        Agent offspring = SimulationManager.Instance != null
+            ? SimulationManager.Instance.SpawnOffspring(this, partner)
+            : null;
+
+        if (offspring != null)
+        {
+            BeginReproductionCooldown();
+            partner.BeginReproductionCooldown();
+        }
+    }
+  
     // -------------------------------------------------------------------------
     // Lifecycle
     // -------------------------------------------------------------------------
@@ -455,6 +531,8 @@ if (best != null)
 
         DebugLogger.LogAgentMatured(agentId);
     }
+
+
 
     // -------------------------------------------------------------------------
     // Public API
@@ -495,11 +573,30 @@ if (best != null)
 
     public void SetAgentId(string id) => agentId = id;
 
+    public void BeginReproductionCooldown()
+    {
+        reproductionCooldownTimer = speciesData != null ? speciesData.ReproductionCooldown : 15f;
+    }
     public bool CanReproduce()
     {
         return lifeStage == LifeStage.Adult
             && speciesData != null
+            && isAlive
+            && !isInShelter
+            && reproductionCooldownTimer <= 0f
             && currentEnergy >= speciesData.MinEnergyToReproduce;
+    }
+
+        private ShelterZone FindCurrentShelter()
+    {
+        ShelterZone[] shelters = FindObjectsByType<ShelterZone>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        foreach (ShelterZone shelter in shelters)
+        {
+            if (shelter != null && shelter.IsAgentInside(this))
+                return shelter;
+        }
+
+        return null;
     }
 
     // -------------------------------------------------------------------------

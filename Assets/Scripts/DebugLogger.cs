@@ -24,7 +24,7 @@ public static class DebugLogger
     public static void LogAgentAction(string agentId, AgentAction action)
     {
         if (!enableAgentLogs || !ShouldLog(LogLevel.Verbose)) return;
-        if (action == AgentAction.Idle || action == AgentAction.MoveForward || action == AgentAction.TurnRight || action == AgentAction.TurnLeft || action == AgentAction.EatGrass) return;
+        if (action == AgentAction.Idle || action == AgentAction.MoveForward || action == AgentAction.TurnRight || action == AgentAction.TurnLeft) return;
         Debug.Log($"[AGENT] {agentId} performing action: {action}");
     }
 

@@ -1,45 +1,72 @@
 {
-    "Predator": {
-        "checkpoints": [
-            {
-                "steps": 8384,
-                "file_path": "results/MojeTrening01/Predator/Predator-8384.onnx",
-                "reward": -0.8125000726431608,
-                "creation_time": 1779825890.4577634,
-                "auxillary_file_paths": [
-                    "results/MojeTrening01/Predator/Predator-8384.pt"
-                ]
-            }
-        ],
-        "final_checkpoint": {
-            "steps": 8384,
-            "file_path": "results/MojeTrening01/Predator.onnx",
-            "reward": -0.8125000726431608,
-            "creation_time": 1779825890.4577634,
-            "auxillary_file_paths": [
-                "results/MojeTrening01/Predator/Predator-8384.pt"
-            ]
-        }
-    },
     "Prey": {
         "checkpoints": [
             {
-                "steps": 34048,
-                "file_path": "results/MojeTrening01/Prey/Prey-34048.onnx",
-                "reward": 0.14112186936108628,
-                "creation_time": 1779825890.492039,
+                "steps": 499968,
+                "file_path": "results/MojeTrening01/Prey/Prey-499968.onnx",
+                "reward": null,
+                "creation_time": 1779877409.9930036,
                 "auxillary_file_paths": [
-                    "results/MojeTrening01/Prey/Prey-34048.pt"
+                    "results/MojeTrening01/Prey/Prey-499968.pt"
+                ]
+            },
+            {
+                "steps": 506624,
+                "file_path": "results/MojeTrening01/Prey/Prey-506624.onnx",
+                "reward": null,
+                "creation_time": 1779877420.6860516,
+                "auxillary_file_paths": [
+                    "results/MojeTrening01/Prey/Prey-506624.pt"
+                ]
+            },
+            {
+                "steps": 543408,
+                "file_path": "results/MojeTrening01/Prey/Prey-543408.onnx",
+                "reward": 4.058632592944538,
+                "creation_time": 1779978975.6290455,
+                "auxillary_file_paths": [
+                    "results/MojeTrening01/Prey/Prey-543408.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 34048,
+            "steps": 543408,
             "file_path": "results/MojeTrening01/Prey.onnx",
-            "reward": 0.14112186936108628,
-            "creation_time": 1779825890.492039,
+            "reward": 4.058632592944538,
+            "creation_time": 1779978975.6290455,
             "auxillary_file_paths": [
-                "results/MojeTrening01/Prey/Prey-34048.pt"
+                "results/MojeTrening01/Prey/Prey-543408.pt"
+            ]
+        }
+    },
+    "Predator": {
+        "checkpoints": [
+            {
+                "steps": 126336,
+                "file_path": "results/MojeTrening01/Predator/Predator-126336.onnx",
+                "reward": -0.8254375657998025,
+                "creation_time": 1779877420.6631758,
+                "auxillary_file_paths": [
+                    "results/MojeTrening01/Predator/Predator-126336.pt"
+                ]
+            },
+            {
+                "steps": 136584,
+                "file_path": "results/MojeTrening01/Predator/Predator-136584.onnx",
+                "reward": null,
+                "creation_time": 1779978975.599956,
+                "auxillary_file_paths": [
+                    "results/MojeTrening01/Predator/Predator-136584.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 136584,
+            "file_path": "results/MojeTrening01/Predator.onnx",
+            "reward": null,
+            "creation_time": 1779978975.599956,
+            "auxillary_file_paths": [
+                "results/MojeTrening01/Predator/Predator-136584.pt"
             ]
         }
     },

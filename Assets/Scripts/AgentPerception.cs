@@ -124,9 +124,9 @@ public class AgentPerception : MonoBehaviour
         {
             float t = count > 1 ? (float)i / (count - 1) : 0.5f;
             float rayAngle = Mathf.Lerp(-viewAngle * 0.5f, viewAngle * 0.5f, t);
-            Vector3 dir = Quaternion.Euler(0f, rayAngle, 0f) * transform.forward;
+            Vector3 dir = Quaternion.Euler(-20f, rayAngle, 0f) * transform.forward;
 
-            RaycastHit[] hits = Physics.RaycastAll(rayOrigin, dir, viewRadius, detectableLayers);
+            RaycastHit[] hits = Physics.RaycastAll(rayOrigin, dir, viewRadius, detectableLayers, QueryTriggerInteraction.Collide);
 
             foreach (RaycastHit hit in hits)
             {

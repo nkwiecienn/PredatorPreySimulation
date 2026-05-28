@@ -17,6 +17,10 @@ public class AgentSpawner : MonoBehaviour
     [Header("Spawn Area")]
     [SerializeField] private Vector3 spawnAreaCenter = Vector3.zero;
     [SerializeField] private Vector3 spawnAreaSize = new Vector3(50f, 0f, 50f);  // Y unused
+        [Header("Shelters")]
+    [SerializeField] private bool useSceneBuildingsAsShelters = true;
+    [SerializeField] private string shelterNamePrefix = "rpgpp_lt_building";
+    [SerializeField] private Vector3 fallbackShelterSize = new Vector3(6f, 3f, 6f);
 
     [Header("Terrain Detection")]
     [SerializeField] private LayerMask terrainLayer;
@@ -29,6 +33,7 @@ public class AgentSpawner : MonoBehaviour
     private void Start()
     {
         ValidatePrefabs();
+        ConfigureSceneShelters();
         SpawnInitialPopulation();
     }
 
@@ -47,6 +52,81 @@ public class AgentSpawner : MonoBehaviour
 
         int total = initialPreyAdults + initialPreyJuveniles
                   + initialPredatorAdults + initialPredatorJuveniles;
+    }
+
+     private void ConfigureSceneShelters()
+    {
+        if (!useSceneBuildingsAsShelters) return;
+
+        Transform[] sceneTransforms = FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        foreach (Transform sceneTransform in sceneTransforms)
+        {
+            GameObject candidate = sceneTransform.gameObject;
+            if (!candidate.name.StartsWith(shelterNamePrefix)) continue;
+
+            EnsureShelterCollider(candidate);
+
+            if (candidate.GetComponent<ShelterZone>() == null)
+                candidate.AddComponent<ShelterZone>();
+        }
+    }
+
+    private void EnsureShelterCollider(GameObject shelter)
+    {
+        if (shelter.GetComponent<Collider>() != null)
+            return;
+
+        BoxCollider collider = shelter.AddComponent<BoxCollider>();
+
+        if (TryGetLocalRendererBounds(shelter, out Bounds localBounds))
+        {
+            collider.center = localBounds.center;
+            collider.size = localBounds.size;
+        }
+        else
+        {
+            collider.center = Vector3.up * (fallbackShelterSize.y * 0.5f);
+            collider.size = fallbackShelterSize;
+        }
+    }
+
+    private bool TryGetLocalRendererBounds(GameObject root, out Bounds localBounds)
+    {
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
+        localBounds = new Bounds(Vector3.zero, fallbackShelterSize);
+
+        if (renderers.Length == 0)
+            return false;
+
+        bool hasBounds = false;
+        Bounds worldBounds = new Bounds(root.transform.position, Vector3.zero);
+        foreach (Renderer renderer in renderers)
+        {
+            if (renderer == null) continue;
+
+            if (!hasBounds)
+            {
+                worldBounds = renderer.bounds;
+                hasBounds = true;
+            }
+            else
+            {
+                worldBounds.Encapsulate(renderer.bounds);
+            }
+        }
+
+        if (!hasBounds)
+            return false;
+
+        localBounds = new Bounds(
+            root.transform.InverseTransformPoint(worldBounds.center),
+            new Vector3(
+                worldBounds.size.x / Mathf.Max(root.transform.lossyScale.x, 0.001f),
+                worldBounds.size.y / Mathf.Max(root.transform.lossyScale.y, 0.001f),
+                worldBounds.size.z / Mathf.Max(root.transform.lossyScale.z, 0.001f)
+            )
+        );
+        return true;
     }
 
     private void SpawnGroup(GameObject prefab, string namePrefix, int count)

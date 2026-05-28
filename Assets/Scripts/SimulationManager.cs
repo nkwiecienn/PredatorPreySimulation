@@ -174,6 +174,7 @@ public class SimulationManager : MonoBehaviour
             Destroy(obj);
             return null;
         }
+        offspring.LazyInitialize();
 
         totalBirths++;
         DebugLogger.LogAgentReproduction(parent1.AgentId, parent2.AgentId, obj.name);
