@@ -113,7 +113,7 @@ checkpoint_settings:
   run_id: MojeTrening01
   initialize_from: null
   load_model: false
-  resume: true
+  resume: false
   force: true
   train_model: false
   inference: false

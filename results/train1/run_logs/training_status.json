@@ -1,0 +1,69 @@
+{
+    "Prey": {
+        "checkpoints": [
+            {
+                "steps": 229947,
+                "file_path": "results/train1/Prey/Prey-229947.onnx",
+                "reward": 8.89713385005792,
+                "creation_time": 1780237856.9818654,
+                "auxillary_file_paths": [
+                    "results/train1/Prey/Prey-229947.pt"
+                ]
+            },
+            {
+                "steps": 277949,
+                "file_path": "results/train1/Prey/Prey-277949.onnx",
+                "reward": null,
+                "creation_time": 1780238737.7423165,
+                "auxillary_file_paths": [
+                    "results/train1/Prey/Prey-277949.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 277949,
+            "file_path": "results/train1/Prey.onnx",
+            "reward": null,
+            "creation_time": 1780238737.7423165,
+            "auxillary_file_paths": [
+                "results/train1/Prey/Prey-277949.pt"
+            ]
+        }
+    },
+    "Predator": {
+        "checkpoints": [
+            {
+                "steps": 123949,
+                "file_path": "results/train1/Predator/Predator-123949.onnx",
+                "reward": null,
+                "creation_time": 1780237857.0167305,
+                "auxillary_file_paths": [
+                    "results/train1/Predator/Predator-123949.pt"
+                ]
+            },
+            {
+                "steps": 136642,
+                "file_path": "results/train1/Predator/Predator-136642.onnx",
+                "reward": -0.16489999275654554,
+                "creation_time": 1780238737.76253,
+                "auxillary_file_paths": [
+                    "results/train1/Predator/Predator-136642.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 136642,
+            "file_path": "results/train1/Predator.onnx",
+            "reward": -0.16489999275654554,
+            "creation_time": 1780238737.76253,
+            "auxillary_file_paths": [
+                "results/train1/Predator/Predator-136642.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.2.0.dev0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

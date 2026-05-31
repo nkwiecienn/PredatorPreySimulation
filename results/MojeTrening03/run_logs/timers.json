@@ -1,0 +1,47 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1780237190",
+        "python_version": "3.10.12 (main, Jul  5 2023, 18:54:27) [GCC 11.2.0]",
+        "command_line_arguments": "/home/libelt/miniconda3/envs/mlagents/bin/mlagents-learn configuration.yaml --run-id=MojeTrening03",
+        "mlagents_version": "1.2.0.dev0",
+        "mlagents_envs_version": "1.2.0.dev0",
+        "communication_protocol_version": "1.5.0",
+        "pytorch_version": "2.2.2+cu121",
+        "numpy_version": "1.23.5",
+        "end_time_seconds": "1780237202"
+    },
+    "total": 11.469371305000095,
+    "count": 1,
+    "self": 0.003979590999733773,
+    "children": {
+        "run_training.setup": {
+            "total": 0.011857145000249147,
+            "count": 1,
+            "self": 0.011857145000249147
+        },
+        "TrainerController.start_learning": {
+            "total": 11.453534569000112,
+            "count": 1,
+            "self": 0.00024778599981800653,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 11.453275761999976,
+                    "count": 1,
+                    "self": 11.453275761999976
+                },
+                "trainer_threads": {
+                    "total": 7.010003173490986e-07,
+                    "count": 1,
+                    "self": 7.010003173490986e-07
+                },
+                "TrainerController._save_models": {
+                    "total": 1.0320000001229346e-05,
+                    "count": 1,
+                    "self": 1.0320000001229346e-05
+                }
+            }
+        }
+    }
+}

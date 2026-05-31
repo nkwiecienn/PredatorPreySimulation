@@ -1,0 +1,13 @@
+﻿{
+  "startedAt": "2026-05-31T18:04:27.5904920+02:00",
+  "durationSeconds": 38.535,
+  "sampleIntervalSeconds": 1,
+  "samples": 40,
+  "initialPrey": 32,
+  "initialPredators": 8,
+  "finalPrey": 31,
+  "finalPredators": 8,
+  "totalBirths": 1,
+  "totalDeaths": 2,
+  "totalKills": 2
+}

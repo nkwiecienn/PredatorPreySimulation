@@ -226,7 +226,7 @@ private void AddClosestObjectObservation(VectorSensor sensor, List<PerceptionObj
             }
 
         }
-        if (species == Species.Prey)
+        if (species == Species.Prey && chosenAction != AgentAction.Mate)
         {
             if (lifeStage == LifeStage.Juvenile)
             {
@@ -427,6 +427,7 @@ if (best != null)
 
         if (best > attackRange)
         {
+            AddReward(-0.0001f);
             agentMovement.MoveTowards(target.transform.position);
             return;
         }
@@ -436,11 +437,12 @@ if (best != null)
             float gain = speciesData != null ? speciesData.AttackEnergyGain : 50f;
             target.Die(DeathCause.Predation);
             AddReward(1.0f);
-            CumulativeReward = GetCumulativeReward();
-            EndEpisode();
+            
+            
             RestoreEnergy(gain);
             DebugLogger.LogAgentKill(agentId, target.AgentId);
             DebugLogger.LogAgentEnergy(agentId, currentEnergy, maxEnergy, "after kill");
+            EndEpisode();
         }
     }
 
@@ -464,8 +466,7 @@ if (best != null)
 
         foreach (Agent candidate in visible)
         {
-            AddReward(0.1f);
-            CumulativeReward = GetCumulativeReward();
+
             if (candidate == null || candidate == this) continue;
             if (!candidate.IsAlive) continue;
             if (candidate.AgentSpecies != species) continue;
@@ -493,6 +494,8 @@ if (best != null)
         {
             BeginReproductionCooldown();
             partner.BeginReproductionCooldown();
+            this.AddReward(0.001f);
+            partner.AddReward(0.001f);
         }
     }
   
